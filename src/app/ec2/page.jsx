@@ -1,10 +1,21 @@
-"use client"
-import { useState } from "react";
+"use client";
+import { useEffect, useState } from "react";
+import genTemplateEC2 from "./genTemplateEC2";
 
 export default function Ec2() {
+  const [template, setTemplate] = useState("");
+  useEffect(() => {
+    if (localStorage.getItem("template") !== null) {
+      const temp = (localStorage.getItem("template"));
+      console.log(`Template: ${temp}`);
+      setTemplate(temp);
+    }
+  }, []);
+
   return (
-    <div className="w-full h-full flex flex-row m-20 items-center">
+    <div className="w-full h-full flex flex-row m-20 items-center justify-around">
       <InstanceContainer />
+      <TemplateContainer templateGen={template} />
     </div>
   );
 }
@@ -13,16 +24,32 @@ function InstanceContainer() {
   const [systemOperative, setSystemOperative] = useState("ubuntu");
   const [instanceType, setInstanceType] = useState("t2.micro");
   const [availabilityZone, setAvailabilityZone] = useState("us-east-1a");
+  const [template, setTemplate] = useState("");
 
   function handleSubmit(e) {
     e.preventDefault();
-    console.log({systemOperative, instanceType, availabilityZone});
+    console.log({ systemOperative, instanceType, availabilityZone });
+    const ec2 = {
+      instanceType: `${instanceType}`,
+      ami: `${systemOperative}`,
+      keyName: ``,
+      subnetId: ``,
+      securityGroupId: ``,
+      name: `new-instance`,
+      region: `${availabilityZone}`,
+    };
+    setTemplate(genTemplateEC2(JSON.stringify(ec2)));
+    localStorage.setItem("template", template);
+    console.log(template);
   }
 
   return (
     <div className="w-[25rem] h-[28rem] bg-white bg-opacity-10 rounded-2xl flex flex-col p-10 items-center">
       <h1 className="self-center text-2xl">Instance Options</h1>
-      <form className="flex flex-col gap-5 mt-10 text-black w-[80%]" onSubmit={handleSubmit}>
+      <form
+        className="flex flex-col gap-5 mt-10 text-black w-[80%]"
+        onSubmit={handleSubmit}
+      >
         {/*AvailabilityZone*/}
         <div className="">
           <label className="text-white">Availability Zone</label>
@@ -44,12 +71,12 @@ function InstanceContainer() {
         <div className="">
           <label className="text-white">System Operative</label>
           <select
-              className="w-full h-8 rounded-lg outline-none mt-2 pl-3 bg-white bg-opacity-50"
-              placeholder="Select an option"
-              onChange={(e) => {
-                setSystemOperative(e.target.value);
-              }}
-            >
+            className="w-full h-8 rounded-lg outline-none mt-2 pl-3 bg-white bg-opacity-50"
+            placeholder="Select an option"
+            onChange={(e) => {
+              setSystemOperative(e.target.value);
+            }}
+          >
             <option className="" value="ubuntu">
               Ubuntu
             </option>
@@ -79,9 +106,28 @@ function InstanceContainer() {
         </div>
         {/*Submit*/}
         <div className="self-center">
-          <button className="w-20 h-8 bg-green-500 rounded-lg text-white">Launch</button>
+          <button className="w-20 h-8 bg-green-500 rounded-lg text-white">
+            Launch
+          </button>
         </div>
       </form>
+    </div>
+  );
+}
+
+function TemplateContainer({ templateGen }) {
+  const [template, setTemplate] = useState("");
+
+  useEffect(() => {
+    setTemplate(templateGen);
+  }, [templateGen]);
+
+  return (
+    <div className="w-[32rem]  bg-white bg-opacity-10 rounded-2xl flex flex-col p-10 items-center">
+      <h1 className="self-center text-2xl">Template</h1>
+      <div className="flex flex-col gap-5 mt-10 text-black w-[80%]">
+        <p>{template}</p>
+      </div>
     </div>
   );
 }
