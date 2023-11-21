@@ -7,20 +7,20 @@ export default function genTemplateEC2({
   name,
   region,
 }) {
-  return `
+  return {
     "AWSTemplateFormatVersion": "2010-09-09",
     "Description": "AWS CloudFormation Template to deploy EC2 instance",
     "Parameters": {
       "Name": {
         "Description": "Name of the instance",
         "Type": "String",
-        "Default": ${name},
+        "Default": name,
         "ConstraintDescription": "must be a valid name."
       },
       "Region": {
         "Description": "Region",
         "Type": "String",
-        "Default": ${region},
+        "Default": region,
         "ConstraintDescription": "must be a valid region."
       }
     },
@@ -28,23 +28,23 @@ export default function genTemplateEC2({
       "EC2Instance": {
         "Type": "AWS::EC2::Instance",
         "Properties": {
-          "InstanceType": ${instanceType},
-          "ImageId": ${ami},
-          "KeyName": ${keyName},
-          "SubnetId": ${subnetId},
+          "InstanceType": instanceType,
+          "ImageId": ami,
+          "KeyName": keyName,
+          "SubnetId": subnetId,
           "SecurityGroupIds": [
-            ${securityGroupId}
+            securityGroupId
           ],
           "Tags": [
             {
               "Key": "Name",
-              "Value": ${name}
+              "Value": name
             }
           ]
         }
       }
     }
-  }`
+  }
 
 }
 // return `

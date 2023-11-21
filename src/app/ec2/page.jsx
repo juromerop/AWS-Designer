@@ -4,16 +4,17 @@ import genTemplateEC2 from "./genTemplateEC2";
 
 export default function Ec2() {
   const [template, setTemplate] = useState("");
+
   useEffect(() => {
     if (localStorage.getItem("template") !== null) {
-      const temp = (localStorage.getItem("template"));
-      console.log(`Template: ${temp}`);
+      const temp = localStorage.getItem("template");
+      console.log("JSONPARSE", JSON.parse(temp, null, 2));
       setTemplate(temp);
     }
   }, []);
 
   return (
-    <div className="w-full h-full flex flex-row m-20 items-center justify-around">
+    <div className="h-full flex flex-row m-20 items-center justify-around">
       <InstanceContainer />
       <TemplateContainer templateGen={template} />
     </div>
@@ -38,8 +39,8 @@ function InstanceContainer() {
       name: `new-instance`,
       region: `${availabilityZone}`,
     };
-    setTemplate(genTemplateEC2(JSON.stringify(ec2)));
-    localStorage.setItem("template", template);
+    setTemplate(genTemplateEC2(ec2));
+    localStorage.setItem("template", JSON.stringify(template));
     console.log(template);
   }
 
@@ -118,16 +119,47 @@ function InstanceContainer() {
 function TemplateContainer({ templateGen }) {
   const [template, setTemplate] = useState("");
 
-  useEffect(() => {
-    setTemplate(templateGen);
-  }, [templateGen]);
+  function prettyPrintJSON(jsonObj) {
+    try {
+        const parsedJSON = JSON.parse(jsonObj);
+        const formattedJSON = JSON.stringify(parsedJSON, null, 2);
+        console.log(formattedJSON);
+        return formattedJSON;
+    } catch (error) {
+        console.error(`Error al decodificar el JSON: ${error.message}`);
+        return null;
+    }
+  }
 
+  useEffect(() => {
+    setTemplate(prettyPrintJSON(templateGen));
+  }, [templateGen]);
+  function handleCopyToClipBoard() {
+    navigator.clipboard.writeText(template);
+  }
   return (
     <div className="w-[32rem]  bg-white bg-opacity-10 rounded-2xl flex flex-col p-10 items-center">
       <h1 className="self-center text-2xl">Template</h1>
-      <div className="flex flex-col gap-5 mt-10 text-black w-[80%]">
-        <p>{template}</p>
+      <div className="flex flex-col gap-5 mt-10 text-black w-full">
+        {
+          template === "" ? (
+            <div className="text-white">No template generated</div>
+          ) : (
+            <textarea
+              className="w-full h-[36rem] overflow-auto rounded-lg outline-none mt-2 pl-3 bg-white bg-opacity-50 scrollbar-hide"
+              value={template}
+              readOnly
+            />
+          )
+        }
+      </div>
+      <div className="mt-5">
+        <button className="w-20 h-8 bg-green-500 rounded-lg text-white" onClick={handleCopyToClipBoard}>
+          Copy
+        </button>
       </div>
     </div>
   );
 }
+
+
