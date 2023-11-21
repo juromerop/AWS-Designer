@@ -1,7 +1,7 @@
 import React from "react";
 import Container from "../../components/container/container";
 
-export default function S3() {
+export default function Dynamo() {
   return (
     <>
     <div className="">
