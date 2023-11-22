@@ -1,4 +1,4 @@
-const dataRegionsEC2 = [
+export const dataRegionsEC2 = [
   {
     "region": "us-east-1a",
     "ami_list": [

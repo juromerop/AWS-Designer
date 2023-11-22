@@ -47,6 +47,10 @@ export default function genTemplateEC2({
   }
 
 }
+
+// function getSO({ os, region, ami_list }) {
+//   return ami_list.find((ami) => ami.os === os && ami.region === region)
+// }
 // return `
 //     "Resources": {
 //       "ec2Instance": {
